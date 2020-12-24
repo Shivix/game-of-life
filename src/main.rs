@@ -1,19 +1,37 @@
-use sdl2::pixels;
-use sdl2::rect;
-use sdl2::render;
+use sdl2::{pixels, rect, render, video, mouse, event};
+use sdl2::EventPump;
 use sdl2::render::Canvas;
+use sdl2::render::WindowCanvas;
 use sdl2::video::Window;
+use sdl2::event::Event;
+use crate::game_board::GameBoard;
 
 mod game_board;
 
-fn draw_graphical_board(canvas: &mut render::WindowCanvas, board: &game_board::GameBoard){
+fn run(event_pump: &mut EventPump, canvas: &mut Canvas<Window>, board: &mut GameBoard){
+    'main: loop {
+        for event in &mut event_pump.poll_iter(){
+            use sdl2::event;
+            match event {
+                event::Event::KeyDown {..} => continue 'main,
+                _ => (),
+            }
+        }
+        std::thread::sleep(std::time::Duration::from_millis(250));
+        draw_graphical_board(canvas, &board);
+        board.next_generation();
+    }
+}
+
+fn draw_graphical_board(canvas: &mut WindowCanvas, board: &game_board::GameBoard){
     canvas.set_draw_color(pixels::Color::RGB(30, 30, 30));
     canvas.clear();
     canvas.set_draw_color(pixels::Color::RGB(255, 255, 255));
     for i in 0..board.grid.len(){
         for j in 0..board.grid.len(){
             if board.grid[i][j] == true {
-                canvas.fill_rect(rect::Rect::new(i as i32 * 10, j as i32 * 10, 10, 10));
+                canvas.fill_rect(rect::Rect::new(i as i32 * 10, j as i32 * 10, 10, 10))
+                    .expect("Failed to create rectangle");
             }
         }
     }
@@ -39,13 +57,10 @@ fn main() {
     canvas.clear();
     canvas.present();
     
+    let mut event_pump = sdl_context.event_pump().expect("Failed to create event pump");
     // init board. 2d array<bool>
     let mut board = game_board::GameBoard::new();
     canvas.set_draw_color(pixels::Color::RGB(255, 255, 255));
-    loop {
-        std::thread::sleep(std::time::Duration::from_millis(300));
-        draw_graphical_board(&mut canvas, &board);
-        board.next_generation();
-    }
-    std::io::stdin().read_line(&mut String::new());
+    
+    run(&mut event_pump, &mut canvas, &mut board);
 }

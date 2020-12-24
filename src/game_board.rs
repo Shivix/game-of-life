@@ -24,7 +24,7 @@ impl GameBoard{
                 if !previous_gen[i][j] {
                     if neighbours == 3 {
                         self.grid[i][j] = true;
-                    }    
+                    }
                 }
                 else{
                     if neighbours >= 2 && neighbours <= 3 {
@@ -67,6 +67,7 @@ impl GameBoard{
         neighbours
     }
     
+    #[allow(dead_code)]
     pub fn draw_board(&self){
         for i in self.grid.iter(){
             for j in i{
