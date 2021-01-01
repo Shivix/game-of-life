@@ -22,9 +22,8 @@ impl GameBoard{
             for j in 0..MAX_BOARD_SIZE{
                 let neighbours = GameBoard::count_neighbours(&previous_gen, i, j);
                 self.grid[i][j] = match (self.grid[i][j], neighbours) {
-                    (false, 3) => true,
+                    (_, 3) => true,
                     (true, 2) => true,
-                    (true, 3) => true,
                     _ => false,
                 };
             }
