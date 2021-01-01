@@ -2,7 +2,7 @@ pub const MAX_BOARD_SIZE: usize = 80;
 
 pub struct GameBoard{
     pub generation: i32,
-    pub grid: [[bool; MAX_BOARD_SIZE]; MAX_BOARD_SIZE],
+    pub grid:[[bool; MAX_BOARD_SIZE]; MAX_BOARD_SIZE],
 }
 
 impl GameBoard{
@@ -21,47 +21,40 @@ impl GameBoard{
         for i in 0..MAX_BOARD_SIZE{
             for j in 0..MAX_BOARD_SIZE{
                 let neighbours = GameBoard::count_neighbours(&previous_gen, i, j);
-                if !previous_gen[i][j] {
-                    if neighbours == 3 {
-                        self.grid[i][j] = true;
-                    }
-                }
-                else{
-                    if neighbours >= 2 && neighbours <= 3 {
-                        self.grid[i][j] = true;
-                    }
-                    else {
-                        self.grid[i][j] = false;
-                    }
-                }
+                self.grid[i][j] = match (self.grid[i][j], neighbours) {
+                    (false, 3) => true,
+                    (true, 2) => true,
+                    (true, 3) => true,
+                    _ => false,
+                };
             }
         }
     }
     
     fn count_neighbours(grid: &[[bool; MAX_BOARD_SIZE]; MAX_BOARD_SIZE], i: usize, j: usize) -> i32{
         let mut neighbours = 0;
-        if *grid.get(i + 1).unwrap_or(&[false; MAX_BOARD_SIZE]).get(j).unwrap_or(&false){
+        if grid.get(i + 1).unwrap_or(&[false; MAX_BOARD_SIZE])[j]{
             neighbours += 1;
         }
-        if *grid.get(i).unwrap_or(&[false; MAX_BOARD_SIZE]).get(j + 1).unwrap_or(&false){
+        if *grid[i].get(j + 1).unwrap_or(&false){
             neighbours += 1;
         }
         if *grid.get(i + 1).unwrap_or(&[false; MAX_BOARD_SIZE]).get(j + 1).unwrap_or(&false){
             neighbours += 1;
         }
-        if *grid.get(i - 1).unwrap_or(&[false; MAX_BOARD_SIZE]).get(j).unwrap_or(&false){
+        if grid[i.checked_sub(1).unwrap_or(0)][j]{
             neighbours += 1;
         }
-        if *grid.get(i).unwrap_or(&[false; MAX_BOARD_SIZE]).get(j - 1).unwrap_or(&false){
+        if grid[i][j.checked_sub(1).unwrap_or(0)]{
             neighbours += 1;
         }
-        if *grid.get(i - 1).unwrap_or(&[false; MAX_BOARD_SIZE]).get(j - 1).unwrap_or(&false){
+        if grid[i.checked_sub(1).unwrap_or(0)][j.checked_sub(1).unwrap_or(0)]{
             neighbours += 1;
         }
-        if *grid.get(i + 1).unwrap_or(&[false; MAX_BOARD_SIZE]).get(j - 1).unwrap_or(&false){
+        if grid.get(i + 1).unwrap_or(&[false; MAX_BOARD_SIZE])[j.checked_sub(1).unwrap_or(0)]{
             neighbours += 1;
         }
-        if *grid.get(i - 1).unwrap_or(&[false; MAX_BOARD_SIZE]).get(j + 1).unwrap_or(&false){
+        if *grid[i.checked_sub(1).unwrap_or(0)].get(j + 1).unwrap_or(&false){
             neighbours += 1;
         }
         neighbours
@@ -87,10 +80,10 @@ impl GameBoard{
         self.grid.get(x + 2).get(y + 1) = true;
         self.grid.get(x + 2).get(y) = true;
     }
-    
-    pub fn add_blinker(&mut self, x: usize, y: usize){ // places at bottom right
-        self.grid.get(x)    .get(y + 1) = true;
-        self.grid.get(x + 1).get(y + 1) = true;
-        self.grid.get(x + 2).get(y + 1) = true;
-    }*/
+    */
+    pub fn add_blinker(&mut self, x: usize, y: usize){ // places at bottom right, vertically
+        *self.grid.get_mut(x + 1)    .unwrap_or(&mut [false; MAX_BOARD_SIZE]).get_mut(y).unwrap_or(&mut false) = true;
+        *self.grid.get_mut(x + 1).unwrap_or(&mut [false; MAX_BOARD_SIZE]).get_mut(y + 1).unwrap_or(&mut false) = true;
+        *self.grid.get_mut(x + 1).unwrap_or(&mut [false; MAX_BOARD_SIZE]).get_mut(y + 2).unwrap_or(&mut false) = true;
+    }
 }
