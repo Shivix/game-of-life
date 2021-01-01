@@ -17,7 +17,7 @@ impl GameBoard{
     }
     
     pub fn next_generation(self: &mut GameBoard){
-        let previous_gen = self.grid.clone();
+        let previous_gen = self.grid;
         for i in 0..MAX_BOARD_SIZE{
             for j in 0..MAX_BOARD_SIZE{
                 let neighbours = GameBoard::count_neighbours(&previous_gen, i, j);
@@ -42,19 +42,19 @@ impl GameBoard{
         if *grid.get(i + 1).unwrap_or(&[false; MAX_BOARD_SIZE]).get(j + 1).unwrap_or(&false){
             neighbours += 1;
         }
-        if grid[i.checked_sub(1).unwrap_or(0)][j]{
+        if grid[i.saturating_sub(1)][j]{
             neighbours += 1;
         }
-        if grid[i][j.checked_sub(1).unwrap_or(0)]{
+        if grid[i][j.saturating_sub(1)]{
             neighbours += 1;
         }
-        if grid[i.checked_sub(1).unwrap_or(0)][j.checked_sub(1).unwrap_or(0)]{
+        if grid[i.saturating_sub(1)][j.saturating_sub(1)]{
             neighbours += 1;
         }
-        if grid.get(i + 1).unwrap_or(&[false; MAX_BOARD_SIZE])[j.checked_sub(1).unwrap_or(0)]{
+        if grid.get(i + 1).unwrap_or(&[false; MAX_BOARD_SIZE])[j.saturating_sub(1)]{
             neighbours += 1;
         }
-        if *grid[i.checked_sub(1).unwrap_or(0)].get(j + 1).unwrap_or(&false){
+        if *grid[i.saturating_sub(1)].get(j + 1).unwrap_or(&false){
             neighbours += 1;
         }
         neighbours
@@ -81,6 +81,8 @@ impl GameBoard{
         self.grid.get(x + 2).get(y) = true;
     }
     */
+    
+    #[allow(dead_code)]
     pub fn add_blinker(&mut self, x: usize, y: usize){ // places at bottom right, vertically
         *self.grid.get_mut(x + 1)    .unwrap_or(&mut [false; MAX_BOARD_SIZE]).get_mut(y).unwrap_or(&mut false) = true;
         *self.grid.get_mut(x + 1).unwrap_or(&mut [false; MAX_BOARD_SIZE]).get_mut(y + 1).unwrap_or(&mut false) = true;
