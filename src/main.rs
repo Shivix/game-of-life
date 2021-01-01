@@ -4,9 +4,20 @@ use sdl2::render::Canvas;
 use sdl2::render::WindowCanvas;
 use sdl2::video::Window;
 use sdl2::event::Event;
-use crate::game_board::GameBoard;
+use crate::game_board::{GameBoard, MAX_BOARD_SIZE};
 
 mod game_board;
+
+#[test]
+fn blinker_test(){
+    let mut test_board = GameBoard{generation: 0, grid: [[false; MAX_BOARD_SIZE]; MAX_BOARD_SIZE]};
+    test_board.add_blinker(1, 1);
+    test_board.next_generation();
+    assert_eq!(test_board.grid[1][2], true);
+    assert_eq!(test_board.grid[2][2], true);
+    assert_eq!(test_board.grid[3][2], true);
+    assert_eq!(test_board.grid[2][1], false);
+}
 
 fn run(event_pump: &mut EventPump, canvas: &mut Canvas<Window>, board: &mut GameBoard){
     'main: loop {
@@ -17,7 +28,7 @@ fn run(event_pump: &mut EventPump, canvas: &mut Canvas<Window>, board: &mut Game
                 _ => (),
             }
         }
-        std::thread::sleep(std::time::Duration::from_millis(250));
+        std::thread::sleep(std::time::Duration::from_millis(200));
         draw_graphical_board(canvas, &board);
         board.next_generation();
     }
