@@ -18,6 +18,7 @@ fn blinker_test(){
     assert_eq!(test_board.grid[2][1], false);
 }
 
+/// runs through each generation of the board, drawing each frame
 fn run(event_pump: &mut EventPump, canvas: &mut Canvas<Window>, board: &mut GameBoard){
     'main: loop {
         for event in &mut event_pump.poll_iter(){
@@ -27,13 +28,15 @@ fn run(event_pump: &mut EventPump, canvas: &mut Canvas<Window>, board: &mut Game
                 _ => (),
             }
         }
-        std::thread::sleep(std::time::Duration::from_millis(200));
-        draw_graphical_board(canvas, &board);
+        std::thread::sleep(std::time::Duration::from_millis(150));
+        render_board(canvas, &board);
+        canvas.present();
         board.next_generation();
     }
 }
 
-fn draw_graphical_board(canvas: &mut WindowCanvas, board: &game_board::GameBoard){
+/// renders the board to a SDL2 canvas
+fn render_board(canvas: &mut WindowCanvas, board: &game_board::GameBoard){
     canvas.set_draw_color(pixels::Color::RGB(30, 30, 30));
     canvas.clear();
     canvas.set_draw_color(pixels::Color::RGB(255, 255, 255));
@@ -45,30 +48,25 @@ fn draw_graphical_board(canvas: &mut WindowCanvas, board: &game_board::GameBoard
             }
         }
     }
-    canvas.present();
 }
 
 fn main() {
     // set up window
     let sdl_context = sdl2::init().expect("Failed to create sdl context");
     let video_subsystem = sdl_context.video().expect("Failed to create video subsystem");
-
     let window = video_subsystem.window("Game of life", 800, 800)
         .position_centered()
         .vulkan()
         .build()
         .expect("Failed to create window");
-
     let mut canvas: Canvas<Window> = window.into_canvas()
         .build()
         .expect("Failed to create canvas");
-    
     canvas.set_draw_color(pixels::Color::RGB(30, 30, 30));
     canvas.clear();
     canvas.present();
     
     let mut event_pump = sdl_context.event_pump().expect("Failed to create event pump");
-    // init board. 2d array<bool>
     let mut board = game_board::GameBoard::new();
     canvas.set_draw_color(pixels::Color::RGB(255, 255, 255));
     

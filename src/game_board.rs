@@ -6,6 +6,7 @@ pub struct GameBoard{
 }
 
 impl GameBoard{
+    /// creates a randomly generated board
     pub fn new() -> GameBoard{
         let mut board = [[false; MAX_BOARD_SIZE];MAX_BOARD_SIZE];
         for i in &mut board{
@@ -16,6 +17,7 @@ impl GameBoard{
         GameBoard{generation: 0, grid: board}
     }
     
+    /// sets board state to the next generation
     pub fn next_generation(self: &mut GameBoard){
         let previous_gen = self.grid;
         for i in 0..MAX_BOARD_SIZE{
@@ -30,6 +32,7 @@ impl GameBoard{
         }
     }
     
+    /// returns the number of neighbours that are true in all 8 surrounding cells
     fn count_neighbours(grid: &[[bool; MAX_BOARD_SIZE]; MAX_BOARD_SIZE], i: usize, j: usize) -> i32{
         let mut neighbours = 0;
         if grid.get(i + 1).unwrap_or(&[false; MAX_BOARD_SIZE])[j]{
@@ -72,17 +75,9 @@ impl GameBoard{
         }
     }
     
-    /*pub fn add_glider(&mut self, x: usize, y: usize){ // places at bottom right
-        self.grid.get(x)    .get(y + 1) = true;
-        self.grid.get(x + 1).get(y + 2) = true;
-        self.grid.get(x + 2).get(y + 2) = true;
-        self.grid.get(x + 2).get(y + 1) = true;
-        self.grid.get(x + 2).get(y) = true;
-    }
-    */
-    
+    /// places a "blinker" pattern in it's first state on the board to the bottom right of the x, y coordinates given
     #[allow(dead_code)]
-    pub fn add_blinker(&mut self, x: usize, y: usize){ // places at bottom right, vertically
+    pub fn add_blinker(&mut self, x: usize, y: usize){
         *self.grid.get_mut(x + 1)    .unwrap_or(&mut [false; MAX_BOARD_SIZE]).get_mut(y).unwrap_or(&mut false) = true;
         *self.grid.get_mut(x + 1).unwrap_or(&mut [false; MAX_BOARD_SIZE]).get_mut(y + 1).unwrap_or(&mut false) = true;
         *self.grid.get_mut(x + 1).unwrap_or(&mut [false; MAX_BOARD_SIZE]).get_mut(y + 2).unwrap_or(&mut false) = true;
